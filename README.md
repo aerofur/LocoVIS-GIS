@@ -78,11 +78,20 @@ If a Destination you have entered doesnt exist on the current map, the ticket wi
 
 Once a train has reached its destination, the ticket is removed from the ticket queue, and your "Completed Jobs" data gets rasied up 1.
 
+## Job Ticket Command Table
+Change | Entry | Takes | Description
+--- | --- | --- | --- 
+`job` | none | `nested strings` | Adds a Ticket
+`clr`,`clear` | job | `number` | Removes a Ticket
+`clr`,`clear` | jobs | `none` | Removes all jobs assigned to the locomotive
+
 **Command Examples:**
 ```
 /gis 3017 job "load" "coal" "derrickson"
 /gis 3017 job "load" "coal" "derrickson", "unload" "coal" "dumper"
 /gis 3017 job "load" "coal" "derrickson", "unload" "coal" "dumper", "return" "coal" "wolfram"
+/gis 3017 clear job 12345
+/gis 3017 clear jobs
 ```
 
 ## Destination Table
