@@ -1,6 +1,19 @@
 # LocoVIS-GIS
 Locomotive Tracking and Logging GIS system for Garry's Mod Locomotive Simulation
 
+## Wiring
+### Antenna
+1. `Locomotive:entity` to the Locomotive Body.
+2. `RLCPT:entity` to your RLCPT2 chip (does not work with PT1 or others, this is optional, but recommended).
+3. `Roadnumber:string` For random roadnumber generators, otherwise it will use the Roadnumber input inside the E2 config.
+4. `Disable` This disabled the Antenna, this is for when a locomotive is in MU, note that this will also stop it from updating so you will not gain any miles on the chip while it is disabled.
+5. `MPH` MPH Speed input for the chip, this MUST be wired.
+### GIS Screen
+1. `EGP:wirelink` EGP wirelink.
+2. `Antenna:wirelink` This is for if you have a GIS Screen mounted within the cab of your locomotive, it gives you direct readings for the job tickets, so this is highly recommended. Note if the Antenna is updated (eg, refreshed, or overwritten) the wirelink will break.
+3. `User:entity` This wires to the EGP (yes its an output of the EGP, this is for the touch screen functions)
+4. `Driver:entity` This wires to your Pod Controller, this is for when a GIS Screen mounted within the cab of your locomotive, allows the use of your number keys for using the screen while in a seat.
+
 ## Chat Commands
 
 Using the `PREFIX` string before your message, you can add, edit, and remove data relating to your train. Prefixs are set within the Antenna Expression 2.
@@ -56,13 +69,14 @@ Job Tickets can have multiple strings, and multiple jobs set at once. Ticket com
 1. If they are Loading, or Unloading, this can also be set to "Return" or anything you desire
 2. The type of load the train is hauling, Eg: Coal, Grain, Boxcars, etc
 3. The destination, where the train has to go. The table of destinations is below.
+4. Origin Location, not used a whole lot, it adds an approx location if you dont add one. Used mainly in yards, to get engine from engine shed to a consist.
 
 Tickets use an algorithm to determine how long it *should* take a train to go from point `A` to point `B`, this allows trains to be late. When a ticket is added, if its the first ticket in the queue, it will have its departure time to the next rounded 5 minutes. Trains that are over 0 minutes late are considered "late", and any over 30 minutes late are considered "very late", this is also displayed on the map, with the color of their Train ID going from Green (ontime), to Orange (late), and Red (very late).
+If the ticket is second or more in the queue, when the first ticket finishes, it will add 30 minutes to the departure time, this allows crews time to do work at their destination, Eg: Take coal cars from Derrickson to the Coal Dumper, Unload coal cars (gives you 30 minutes to do this), and then however long it determines it takes to get to your next destination.
 
 If a Destination you have entered doesnt exist on the current map, the ticket will have to be manually removed when the train reaches its destination.
 
 Once a train has reached its destination, the ticket is removed from the ticket queue, and your "Completed Jobs" data gets rasied up 1.
-
 
 **Command Examples:**
 ```
