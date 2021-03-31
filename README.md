@@ -1,6 +1,40 @@
 # LocoVIS-GIS
 Locomotive Tracking and Logging GIS system for Garry's Mod Locomotive Simulation
 
+## Initial Setup
+### Antenna
+
+Inside the antenna e2 is the locomotive config:
+```
+    PREFIX = "/gis"    #Chat Command Prefix.
+    Type = 1 #0 = Other, 1 = Locomotive, 2 = Passenger, 3 = Portable, 4 = Vehicle.
+    Railroad = "CP" #Railroad
+    RoadNumber = "3017"   #Locomotive Road Number.
+    UnitClass = "CP3017"   #Eg, "GP38-2", "DFB".
+```
+
+Variable | Takes | Description
+--- | --- | ---
+PREFIX | `string` | The prefix used before commands.
+Type | `number` | Vehicle Type, this will mainly be Locomotive. (Passenger is for passenger specific DMUs)
+Railroad | `string` | The railroad name, this should be short, use the reporting mark.
+RoadNumber | `string` | Road/Runningnumber, this can be overwritten by setting a string on the `Roadnumber:string` input, used in random number generators.
+UnitClass | `string` | This should either be the locomotive model, or reporting mark plus the roadnumber.
+
+The top of the antenna has a arrow, this arrow should always be facing towards the side considered the front of the locomotive.
+
+![](/docs/images/Screenshot_33.png)
+
+### GIS Screen
+
+If you are mounting a GIS Screen inside the locomotive cab, it is recommended that you set the Expression 2 model to `models/magtrainslocos/functiondisplay.mdl` (uncomment the `@model` at the top of the GIS Screen e2), and that you set `FunctionDisplayMode` in the config to `1`, this will change the display from dispatching mode, to locomotive mode, this will make the interaction be via the number keys (not the numpad).
+
+Simply look at the EGP screen while in a linked pod controller seat, and press the according key for the button you would like to press. There are 8 buttons, it goes 1 on the far left, to 8 on the far right.
+
+The EGP screen model can be set by putting this in console `wire_egp_model models/magtrainslocos/functiondisplay_screen.mdl`.
+
+![](/docs/images/Screenshot_34.png)
+
 ## Wiring
 ### Antenna
 1. `Locomotive:entity` to the Locomotive Body.
@@ -10,7 +44,7 @@ Locomotive Tracking and Logging GIS system for Garry's Mod Locomotive Simulation
 5. `MPH` MPH Speed input for the chip, this MUST be wired.
 ### GIS Screen
 1. `EGP:wirelink` EGP wirelink.
-2. `Antenna:wirelink` This is for if you have a GIS Screen mounted within the cab of your locomotive, it gives you direct readings for the job tickets, so this is highly recommended. Note if the Antenna is updated (eg, refreshed, or overwritten) the wirelink will break.
+2. `Antenna:entity` This is for if you have a GIS Screen mounted within the cab of your locomotive, it gives you direct readings for the job tickets, so this is highly recommended.
 3. `User:entity` This wires to the EGP (yes its an output of the EGP, this is for the touch screen functions)
 4. `Driver:entity` This wires to your Pod Controller, this is for when a GIS Screen mounted within the cab of your locomotive, allows the use of your number keys for using the screen while in a seat.
 
