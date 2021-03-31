@@ -44,7 +44,7 @@ The EGP screen model can be set by putting this in console `wire_egp_model model
 5. `MPH` MPH Speed input for the chip, this MUST be wired.
 ### GIS Screen
 1. `EGP:wirelink` EGP wirelink.
-2. `Antenna:entity` This is for if you have a GIS Screen mounted within the cab of your locomotive, it gives you direct readings for the job tickets, so this is highly recommended.
+2. `Antenna:entity` This is for if you have a GIS Screen mounted within the cab of your locomotive, it gives you direct readings for the job tickets, so this is highly recommended. Note: If the antenna chip is updated or refreshed, it will unlink from the screen, just wiremod things.
 3. `User:entity` This wires to the EGP (yes its an output of the EGP, this is for the touch screen functions)
 4. `Driver:entity` This wires to your Pod Controller, this is for when a GIS Screen mounted within the cab of your locomotive, allows the use of your number keys for using the screen while in a seat.
 
