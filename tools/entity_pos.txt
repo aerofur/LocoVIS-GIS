@@ -1,0 +1,9 @@
+@name locovis/tools/entity_pos
+@inputs 
+@outputs 
+@persist 
+@trigger none
+
+if(first()){
+    print(entity():pos())
+}

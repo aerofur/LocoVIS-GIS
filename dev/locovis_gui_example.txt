@@ -1,0 +1,100 @@
+@name /locovis/dev/LocoVIS Gui Example
+@inputs 
+@outputs 
+@persist [Frame]:dframe [MapPanel MapInnerPanel JobPanel UserPanel LeaderboardPanel SettingsPanel]:dpanel Vertical Horizontal
+@trigger 
+
+if(duped() | dupefinished()){ reset() }
+if(first()){
+    Frame = dframe(1)
+    Frame:setTitle("LocoVIS GIS")
+    Frame:setSize(1440,812)
+    Frame:center()
+    Frame:setIcon("icon16/application_form.png")
+    Frame:makePopup()
+    Frame:create()
+    
+    runOnVgui(1)
+    runOnKeys(owner(),1)
+    
+    MapPanel = dpanel(2)
+    MapPanel:create()
+
+    JobPanel = dpanel(3)
+    JobPanel:create()
+        
+    UserPanel = dpanel(4)
+    UserPanel:create()
+    
+    LeaderboardPanel = dpanel(5)
+    LeaderboardPanel:create()
+    
+    SettingsPanel = dpanel(6)
+    SettingsPanel:create()
+    
+    PropertySheet = dpropertysheet(7, Frame)
+    PropertySheet:addSheet("Map",MapPanel,"icon16/map.png")
+    PropertySheet:addSheet("Job Tickets",JobPanel,"icon16/tag_blue.png")
+    PropertySheet:addSheet("Leaderboard",LeaderboardPanel,"icon16/chart_bar.png")
+    PropertySheet:addSheet("User",UserPanel,"icon16/user.png")
+    PropertySheet:addSheet("Settings",SettingsPanel,"icon16/wrench.png")
+    PropertySheet:dock(_DOCK_FILL)
+    PropertySheet:create()
+    
+    MapInnerPanel = dpanel(8,MapPanel)
+    MapInnerPanel:setSize(vec2(200,200))
+    MapInnerPanel:create()
+    
+    L = dimagebutton(9,MapInnerPanel)
+    L:setSize(vec2(16,16))
+    L:setPos(35,35)
+    L:setImage("icon16/locos.png")
+    L:create()
+            
+    function void icon_locomotive(ID,Position:vector,Type:string,TrainID:string,TrainIDColor:vector,Angle:angle,Timeout,Warning,ZoomFactor){
+        local Pos = (Position*ZoomFactor)/(18000/(512/2))
+        if(inrange(Pos,vec(-218,-218,-inf()),vec(218,218,inf()))){
+            local Icon = ""
+            switch(Type){
+                case "OTH",
+                    Icon = "icon16/help.png"
+                break
+                case "LOC",
+                    Icon = "icon16/locos.png"
+                break
+                case "PAS",
+                    Icon = "icon16/passenger.png"
+                break
+                case "POR",
+                    Icon = "icon16/freight.png"
+                break
+                case "VEH",
+                    Icon = "icon16/car.png"
+                break
+            }
+                          
+            L = dimagebutton(ID,MapPanel)
+            L:setSize(vec2(16,16))
+            L:setPos(Pos:x(),Pos:y())
+            L:setImage(Icon)
+            L:create()
+        }
+    }
+}
+#[
+if(keyClkPressed() == "mouse_wheel_up"){
+    Vertical+=10
+    MapInnerPanel:setPos(vec2(0,Vertical))
+    MapInnerPanel:modify()
+    print(Vertical)
+}
+
+if(keyClkPressed() == "mouse_wheel_down"){
+    Vertical-=10
+    MapInnerPanel:setPos(vec2(0,Vertical))
+    MapInnerPanel:modify()
+    print(Vertical)
+}
+
+
+

@@ -1,0 +1,222 @@
+@name locovis/tools/LocoVis Mapper
+@inputs [EGP EGP_Console]:wirelink [Locomotive]:entity Pause
+@outputs [SplineData]:table
+@persist [Color SplineData LoadedSection]:table [SaveLocation CustomStart]:vector [TrackType SectionName SectionType]:string SplineDataIndex EGPIndex EGPIndex2 Feet MilePostsSet IsCustom
+@trigger none
+
+E = Locomotive
+TrackType = "locovis/includes/tracks/trakpak2"
+#include "locovis/includes/tracks/trakpak2"
+
+if(duped() | dupefinished()){ reset() }
+if(first()){
+    runOnChat(1)
+    EGP:egpClear()
+    EGP_Console:egpClear()
+    EGPIndex = 1
+    EGPIndex2 = 1
+    SaveLocation = round(E:pos(),0)
+    Feet = 0
+    MilePostsSet = 0
+    SplineDataIndex = 1
+    SplineData = table()
+    
+    Color["blue",vector] = vec(10,132,255)
+    Color["brown",vector] = vec(172,142,104)
+    Color["gray",vector] = vec(152,152,157)
+    Color["green",vector] = vec(84,186,87)
+    Color["indigo",vector] = vec(94,92,230)
+    Color["orange",vector] = vec(255,159,10)
+    Color["pink",vector] = vec(255,55,95)
+    Color["purple",vector] = vec(191,90,242)
+    Color["red",vector] = vec(255,69,58)
+    Color["teal",vector] = vec(100,210,255)
+    Color["yellow",vector] = vec(255,214,10)
+
+    function mapperPrint(Text:string,Level){
+        switch(Level){
+            case 0,
+                printColor(Color["indigo",vector],"LocoVis ",Color["purple",vector],"[CMD] ",vec(255),Text)
+                hideChat(1)
+            break
+        }
+    }
+        
+    function string notApplicable(String:string){
+        return (String != "" ? String : "N/A")
+    }
+    
+    function void wirelink:drawGrid(Lines){
+        for(I=0,Lines){
+            This:egpLine(EGPIndex,vec2(((512/Lines)*I),0),vec2(((512/Lines)*I),512))
+            This:egpColor(EGPIndex,vec(0,63,127))
+            EGPIndex+=1
+        }
+        for(I=0,Lines){
+            This:egpLine(EGPIndex,vec2(0,((512/Lines)*I)),vec2(512,((512/Lines)*I)))
+            This:egpColor(EGPIndex,vec(0,63,127))
+            EGPIndex+=1
+        }
+    }
+    
+    function void wirelink:updateGrid(){
+        This:egpClear()
+        EGPIndex = 1
+        This:drawGrid(24)
+        #[
+        foreach(K:string,V:table=LoadedSection["data",table]){
+            local LastPos = (SplineData[(I-1),vector]/(18000/(512/2)))
+            local Pos = (SplineData[I,vector]/(18000/(512/2)))
+            
+            This:egpLine(EGPIndex,vec2((512/2)-LastPos:y(),(512/2)-LastPos:x()),vec2((512/2)-Pos:y(),(512/2)-Pos:x()))
+            This:egpColor(EGPIndex,vec(255))
+            EGPIndex+=1
+        }
+        ]#
+    }
+    
+    function void wirelink:updateConsole(){
+        This:egpClear()
+        
+        EGPIndex2 = 1
+        This:egpText(EGPIndex2,"locovis/maps/"+map()+".txt",vec2(12,12))
+        This:egpFont(EGPIndex2,"Lucida Console",14)
+
+        EGPIndex2 = 2
+        This:egpText(EGPIndex2,TrackType+".txt",vec2(12,12+(20*1)))
+        This:egpFont(EGPIndex2,"Lucida Console",14)
+
+        EGPIndex2 = 3
+        This:egpText(EGPIndex2,"Track Width: "+TrackWidth+" units",vec2(12,12+(20*2)))
+        This:egpFont(EGPIndex2,"Lucida Console",14)
+                
+        EGPIndex2 = 4
+        This:egpText(EGPIndex2,"Section Name: "+notApplicable(SectionName),vec2(12,12+(20*3)))
+        This:egpFont(EGPIndex2,"Lucida Console",14)
+                
+        EGPIndex2 = 5
+        This:egpText(EGPIndex2,"Section Distance: "+Feet+"ft",vec2(12,12+(20*4)))
+        This:egpFont(EGPIndex2,"Lucida Console",14)
+        
+        EGPIndex2 = 6
+        This:egpText(EGPIndex2,"Mileposts Set: "+MilePostsSet,vec2(12,12+(20*5)))
+        This:egpFont(EGPIndex2,"Lucida Console",14)
+    }
+}
+
+interval(200)
+
+if(chatClk()){
+    local CMD = lastSaid():explode(" ")
+    local CMDString = lastSaid():explode("\"")
+    local PREFIX = "."
+    
+    switch(CMD[1,string]){
+        case PREFIX+"section",
+            local SectionData = gTable("locovis_sectiondata",1)
+            SectionName = CMDString[2,string]:lower()
+            SectionType = CMDString[4,string]:lower()
+            LoadedSection:clear()
+            IsCustom = 0
+            CustomStart = vec(0,0,0)
+            
+            if(SectionData["data",table]:count() == 0){
+                SectionData["data",table] = table()
+            }
+            
+            if(SectionData["data",table]:exists(SectionName)){
+                mapperPrint("Section \""+SectionName+"\" already exists, data will be added to this section. To overwrite, remove the section first.",0)
+                LoadedSection = SectionData["data",table][SectionName,table]
+            }
+            else{
+                SectionData["data",table][SectionName,table] = table()
+                mapperPrint("Starting section \""+SectionName+"\" of type \""+SectionType+"\".",0)
+            }
+        break
+        case PREFIX+"sectioncustom",
+            local SectionData = gTable("locovis_sectiondata",1)
+            SectionName = CMDString[2,string]:lower()
+            SectionType = CMDString[4,string]:lower()
+            LoadedSection:clear()
+            IsCustom = 1
+            CustomStart = owner():aimPos()
+            
+            if(SectionData["data",table]:count() == 0){
+                SectionData["data",table] = table()
+            }
+            
+            if(SectionData["data",table]:exists(SectionName)){
+                mapperPrint("Section \""+SectionName+"\" already exists, data will be added to this section. To overwrite, remove the section first.",0)
+                LoadedSection = SectionData["data",table][SectionName,table]
+            }
+            else{
+                SectionData["data",table][SectionName,table] = table()
+                mapperPrint("Starting section \""+SectionName+"\" of type \""+SectionType+"\".",0)
+            }
+        break
+        case PREFIX+"sectionfinish",
+            local SectionData = gTable("locovis_sectiondata",1)
+            local SaveData = table()
+            
+            if(IsCustom == 0){
+                SaveData = SplineData
+            }
+            else{
+                SaveData[1,vector] = CustomStart
+                SaveData[2,vector] = owner():aimPos()
+            }
+            
+            if(SectionData["data",table]:count() == 0){
+                SectionData["data",table] = table()
+            }
+            
+            if(SectionData["data",table]:exists(SectionName)){
+                local Table = table()
+                local Index = (SectionData["data",table][SectionName,table]:count()+1)
+                Table["name",string] = SectionName
+                Table["type",string] = SectionType
+                Table["data",table] = SaveData
+                
+                mapperPrint("Finished adding to section \""+SectionName+"\" of type \""+SectionType+"\".",0)
+                SectionData["data",table][SectionName,table][Index,table] = Table
+                Feet = 0
+                SplineDataIndex = 1
+                SplineData:clear()
+            }
+            else{
+                local Table = table()
+                Table["name",string] = SectionName
+                Table["type",string] = SectionType
+                Table["data",table] = SaveData
+                
+                mapperPrint("Finished section \""+SectionName+"\" of type \""+SectionType+"\".",0)
+                
+                SectionData["data",table][SectionName,table] = table()
+                SectionData["data",table][SectionName,table][1,table] = Table
+            }
+        break
+        case PREFIX+"sectionremove",
+            local SectionData = gTable("locovis_sectiondata",1)
+            SectionName = CMDString[2,string]:lower()
+            SectionData["data",table]:remove(SectionName)
+            mapperPrint("Removed section \""+SectionName+"\".",0)
+        break
+    }
+}
+
+if(changed(Pause) & !Pause){
+    SplineData[SplineDataIndex,vector] = E:pos()
+    SplineDataIndex+=1    
+}
+
+if(!Pause){
+    Feet = Feet+round(toUnit("ft",abs(SaveLocation:distance(round(E:pos(),0)))),0)
+
+    if(changed(round((Feet/10),0))){
+        SplineData[SplineDataIndex,vector] = E:pos()
+        SplineDataIndex+=1
+        EGP:updateGrid()
+    }
+}
+EGP_Console:updateConsole()
+SaveLocation = round(E:pos(),0)

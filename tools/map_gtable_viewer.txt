@@ -1,0 +1,9 @@
+@name locovis/tools/map_gtable_viewer
+@inputs 
+@outputs 
+@persist 
+@trigger
+ 
+local SectionData = gTable("locovis_sectiondata",1)
+local Table = SectionData["data",table]
+printTable(Table)

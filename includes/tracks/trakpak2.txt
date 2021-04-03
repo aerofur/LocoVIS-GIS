@@ -1,0 +1,7 @@
+@name locovis/includes/tracks/trakpak2
+@inputs 
+@outputs 
+@persist TrackWidth
+@trigger 
+
+TrackWidth = 256

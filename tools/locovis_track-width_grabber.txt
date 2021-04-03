@@ -1,0 +1,9 @@
+@name locovis/tools/LocoVis Track-Width Grabber
+@inputs E:entity
+@outputs 
+@persist 
+@trigger 
+
+if(first()){
+    print(E:boxSize():y())
+}
